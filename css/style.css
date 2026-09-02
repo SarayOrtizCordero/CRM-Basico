@@ -409,7 +409,7 @@ textarea {
 }
 
 .kanban-column.drag-over {
-  background: #e8effc;
+  background: var(--primary-soft);
   border-color: var(--accent);
 }
 
@@ -565,7 +565,7 @@ textarea {
 .icon-btn.danger:hover {
   color: var(--danger);
   border-color: var(--danger);
-  background: rgba(220, 38, 38, 0.08);
+  background: var(--danger-soft);
 }
 
 .empty-text {
