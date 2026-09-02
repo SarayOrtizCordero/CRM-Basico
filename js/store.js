@@ -1,11 +1,11 @@
 const STORAGE_KEY = 'crm_basico_contacts';
 
 const STATUSES = [
-  { key: 'nuevo', label: 'Nuevo', color: '#64748b' },
-  { key: 'contactado', label: 'Contactado', color: '#2563eb' },
-  { key: 'propuesta', label: 'Propuesta', color: '#d97706' },
-  { key: 'ganado', label: 'Ganado', color: '#16a34a' },
-  { key: 'perdido', label: 'Perdido', color: '#dc2626' },
+  { key: 'nuevo', label: 'Nuevo', color: '#8a7565' },
+  { key: 'contactado', label: 'Contactado', color: '#b64211' },
+  { key: 'propuesta', label: 'Propuesta', color: '#df3314' },
+  { key: 'ganado', label: 'Ganado', color: '#3f6b28' },
+  { key: 'perdido', label: 'Perdido', color: '#b11e1b' },
 ];
 
 function statusInfo(key) {
