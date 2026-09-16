@@ -29,6 +29,8 @@
   --font-heading: 'Montserrat', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  color-scheme: light;
 }
 
 :root[data-theme="dark"] {
@@ -56,6 +58,8 @@
 
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.45);
+
+  color-scheme: dark;
 }
 
 * {
@@ -89,10 +93,17 @@ button:active {
 input, select, textarea {
   font-family: inherit;
   padding: 10px 12px;
+  background: var(--surface);
+  color: var(--text);
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
-  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 input:focus, select:focus, textarea:focus {
