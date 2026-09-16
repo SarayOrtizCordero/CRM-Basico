@@ -18,7 +18,8 @@ const els = {
   modalTitle: document.getElementById('contact-modal-title'),
   form: document.getElementById('contact-form'),
   fName: document.getElementById('contact-name'),
-  fCompany: document.getElementById('contact-company'),
+  fService: document.getElementById('contact-service'),
+  fSource: document.getElementById('contact-source'),
   fEmail: document.getElementById('contact-email'),
   fPhone: document.getElementById('contact-phone'),
   fStatus: document.getElementById('contact-status'),
@@ -31,10 +32,30 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<span class="toast-icon">🔥</span><span>${escapeHtml(message)}</span>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+function notifyStatusChange(newStatus, previousStatus) {
+  if (newStatus === previousStatus) return;
+  if (newStatus === 'turno') showToast('Booked. We love to see it.');
+  else if (newStatus === 'atendido') showToast('Nice work.');
+}
+
 function getFilteredContacts() {
   const term = searchTerm.trim().toLowerCase();
   return contacts.filter((c) => {
-    const matchesTerm = !term || c.name.toLowerCase().includes(term) || c.company.toLowerCase().includes(term);
+    const matchesTerm = !term || c.name.toLowerCase().includes(term) || (c.service || '').toLowerCase().includes(term);
     const matchesStatus = !statusFilter || c.status === statusFilter;
     return matchesTerm && matchesStatus;
   });
@@ -68,7 +89,7 @@ function renderKanban() {
       ? items.map((c) => `
         <div class="kanban-card" draggable="true" data-id="${c.id}">
           <h4>${escapeHtml(c.name)}</h4>
-          <p class="card-company">${escapeHtml(c.company || 'Sin empresa')}</p>
+          <p class="card-company">${escapeHtml(c.service || 'Sin servicio')}</p>
           <div class="card-meta">${escapeHtml(c.email || 'Sin email')}</div>
         </div>
       `).join('')
@@ -115,7 +136,9 @@ function attachKanbanEvents() {
       const newStatus = col.dataset.status;
       const contact = contacts.find((c) => c.id === draggedId);
       if (contact && contact.status !== newStatus) {
+        const previousStatus = contact.status;
         contact.status = newStatus;
+        notifyStatusChange(newStatus, previousStatus);
         saveContacts(contacts);
         renderAll();
       }
@@ -134,7 +157,7 @@ function renderTable() {
     return `
       <tr>
         <td class="cell-name">${escapeHtml(c.name)}</td>
-        <td class="cell-muted">${escapeHtml(c.company || '—')}</td>
+        <td class="cell-muted">${escapeHtml(c.service || '—')}</td>
         <td class="cell-muted">${escapeHtml(c.email || '—')}</td>
         <td class="cell-muted">${escapeHtml(c.phone || '—')}</td>
         <td><span class="status-badge" style="background:${s.color}22;color:${s.color}"><span class="stat-dot" style="background:${s.color}"></span>${s.label}</span></td>
@@ -197,7 +220,8 @@ function openEditModal(id) {
   editingId = id;
   els.modalTitle.textContent = 'Editar contacto';
   els.fName.value = contact.name;
-  els.fCompany.value = contact.company || '';
+  els.fService.value = contact.service || '';
+  els.fSource.value = contact.source || 'whatsapp';
   els.fEmail.value = contact.email || '';
   els.fPhone.value = contact.phone || '';
   els.fStatus.value = contact.status;
@@ -215,7 +239,8 @@ function handleFormSubmit(e) {
   e.preventDefault();
   const data = {
     name: els.fName.value.trim(),
-    company: els.fCompany.value.trim(),
+    service: els.fService.value.trim(),
+    source: els.fSource.value,
     email: els.fEmail.value.trim(),
     phone: els.fPhone.value.trim(),
     status: els.fStatus.value,
@@ -225,9 +250,12 @@ function handleFormSubmit(e) {
 
   if (editingId) {
     const contact = contacts.find((c) => c.id === editingId);
+    const previousStatus = contact.status;
     Object.assign(contact, data);
+    notifyStatusChange(data.status, previousStatus);
   } else {
     contacts.push({ id: uid(), ...data, createdAt: Date.now() });
+    showToast('New patient unlocked.');
   }
   saveContacts(contacts);
   closeModal();
