@@ -32,6 +32,9 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+const SOURCE_LABELS = { whatsapp: 'WhatsApp', instagram: 'Instagram', web: 'Web', telefono: 'Teléfono', formulario: 'Formulario' };
+function sourceLabel(key) { return SOURCE_LABELS[key] || key || '—'; }
+
 function showToast(message) {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -66,7 +69,7 @@ function renderStats() {
   const cards = [`
     <div class="stat-card total">
       <span class="stat-value">${total}</span>
-      <span class="stat-label">Total contactos</span>
+      <span class="stat-label">Total pacientes</span>
     </div>
   `];
   STATUSES.forEach((s) => {
@@ -90,10 +93,10 @@ function renderKanban() {
         <div class="kanban-card" draggable="true" data-id="${c.id}">
           <h4>${escapeHtml(c.name)}</h4>
           <p class="card-company">${escapeHtml(c.service || 'Sin servicio')}</p>
-          <div class="card-meta">${escapeHtml(c.email || 'Sin email')}</div>
+          <div class="card-meta">${escapeHtml(c.email || 'Sin email')} · ${escapeHtml(sourceLabel(c.source))}</div>
         </div>
       `).join('')
-      : '<p class="kanban-empty">Sin contactos</p>';
+      : '<p class="kanban-empty">Sin pacientes</p>';
 
     return `
       <div class="kanban-column" data-status="${s.key}">
@@ -149,7 +152,7 @@ function attachKanbanEvents() {
 function renderTable() {
   const filtered = getFilteredContacts();
   if (!filtered.length) {
-    els.tableBody.innerHTML = `<tr><td colspan="6" class="empty-text">No hay contactos que coincidan con la búsqueda.</td></tr>`;
+    els.tableBody.innerHTML = `<tr><td colspan="7" class="empty-text">No hay pacientes que coincidan con la búsqueda.</td></tr>`;
     return;
   }
   els.tableBody.innerHTML = filtered.map((c) => {
@@ -158,6 +161,7 @@ function renderTable() {
       <tr>
         <td class="cell-name">${escapeHtml(c.name)}</td>
         <td class="cell-muted">${escapeHtml(c.service || '—')}</td>
+        <td class="cell-muted">${escapeHtml(sourceLabel(c.source))}</td>
         <td class="cell-muted">${escapeHtml(c.email || '—')}</td>
         <td class="cell-muted">${escapeHtml(c.phone || '—')}</td>
         <td><span class="status-badge" style="background:${s.color}22;color:${s.color}"><span class="stat-dot" style="background:${s.color}"></span>${s.label}</span></td>
@@ -207,7 +211,7 @@ function deleteContact(id) {
 
 function openAddModal() {
   editingId = null;
-  els.modalTitle.textContent = 'Nuevo contacto';
+  els.modalTitle.textContent = 'Nuevo paciente';
   els.form.reset();
   els.fStatus.value = 'nuevo';
   els.modal.classList.remove('hidden');
@@ -218,7 +222,7 @@ function openEditModal(id) {
   const contact = contacts.find((c) => c.id === id);
   if (!contact) return;
   editingId = id;
-  els.modalTitle.textContent = 'Editar contacto';
+  els.modalTitle.textContent = 'Editar paciente';
   els.fName.value = contact.name;
   els.fService.value = contact.service || '';
   els.fSource.value = contact.source || 'whatsapp';

@@ -40,7 +40,11 @@ function loadContacts() {
     return seeded;
   }
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.some((c) => !STATUSES.some((s) => s.key === c.status))) {
+      throw new Error('shape');
+    }
+    return parsed;
   } catch {
     const seeded = seedContacts();
     saveContacts(seeded);
