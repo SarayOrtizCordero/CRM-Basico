@@ -482,6 +482,11 @@ git commit -m "feat(basico): pacientes con servicio/origen y toasts con personal
 **Files:**
 - Modify: `CRM/basico/css/style.css`
 
+**Note:** unlike `intermedio`/`completo`, básico's `.stats-grid` count tracks the
+stage count directly (see Step 2b) — this tier's `renderStats()` pushes one
+stat card per `STATUSES` entry, so it isn't a fixed 5-6 card layout like the
+other two tiers.
+
 - [ ] **Step 1: Kanban grid, desktop**
 
 Old:
@@ -519,6 +524,27 @@ New:
     grid-template-columns: repeat(7, 220px);
   }
 ```
+
+- [ ] **Step 2b: `.stats-grid` — swap the hardcoded 6-column grid for a fluid one**
+
+Old:
+```css
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+```
+New:
+```css
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+```
+
+Leave the two responsive overrides further down (`.stats-grid { grid-template-columns: repeat(3, 1fr); }` and `repeat(2, 1fr)` inside `@media` blocks) untouched — a fixed small column count there is fine regardless of total card count, since the grid already wraps extra cards onto new rows.
 
 - [ ] **Step 3: Append toast component styles at the end of the file**
 
